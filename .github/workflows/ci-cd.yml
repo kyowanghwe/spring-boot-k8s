@@ -35,5 +35,5 @@ jobs:
 
       - name: Push to GHCR
         run: |
-          docker push ghcr.io/harish981/spring-boot-k8s:latest
-          docker push ghcr.io/harish981/spring-boot-k8s:${{ github.sha }}
+          docker push ghcr.io/kyowanghwe/spring-boot-k8s:latest
+          docker push ghcr.io/kyowanghwe/spring-boot-k8s:${{ github.sha }}
