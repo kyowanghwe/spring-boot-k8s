@@ -37,3 +37,7 @@ jobs:
         run: |
           docker push ghcr.io/kyowanghwe/spring-boot-k8s:latest
           docker push ghcr.io/kyowanghwe/spring-boot-k8s:${{ github.sha }}
+
+      - name: Update image tag in deployment.yaml
+        run: |
+          sed -i "s|ghcr.io/kyowanghwe/spring-boot-k8s:.*|ghcr.io/kyowanghwe/spring-boot-k8s:${{ github.sha }}|g" k8s/deployment.yaml
