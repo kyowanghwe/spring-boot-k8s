@@ -20,6 +20,6 @@ public class DemoApplication {
 	public String hello() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		String formatted = LocalDateTime.now().format(formatter);
-		return "Hello from Spring Boot on Kubernetes!111 " + formatted;
+		return "Hello from Spring Boot on Kubernetes!222 " + formatted;
 	}
 }
