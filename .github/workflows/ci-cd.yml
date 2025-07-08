@@ -3,50 +3,67 @@ name: CI/CD to GHCR
 on: [push]
 
 permissions:
-  contents: read
-  packages: write
+  contents: write     # needed to push changes to the repo
+  packages: write     # needed to push to GHCR
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up JDK 17
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: ☕ Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Maven
-        run: mvn clean package
-
-      - name: Build Docker image
+      - name: 🛠️ Build with Maven
         run: |
+          echo "::group::Maven Build"
+          mvn clean package -DskipTests
+          echo "::endgroup::"
+
+      - name: 🐳 Build Docker image
+        run: |
+          echo "::group::Docker Build"
           docker build -t ghcr.io/kyowanghwe/spring-boot-k8s:latest .
           docker tag ghcr.io/kyowanghwe/spring-boot-k8s:latest ghcr.io/kyowanghwe/spring-boot-k8s:${{ github.sha }}
+          echo "::endgroup::"
 
-      - name: Login to GHCR
+      - name: 🔐 Login to GHCR
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: kyowanghwe
           password: ${{ secrets.GHCR_PAT }}
 
-      - name: Push to GHCR
+      - name: 📤 Push image to GHCR
         run: |
+          echo "::group::Push Docker Image"
           docker push ghcr.io/kyowanghwe/spring-boot-k8s:latest
           docker push ghcr.io/kyowanghwe/spring-boot-k8s:${{ github.sha }}
+          echo "::endgroup::"
 
-      - name: Update image tag in deployment.yaml
+      - name: 📝 Update deployment.yaml with new image tag
         run: |
+          echo "::group::Update deployment.yaml"
           sed -i "s|ghcr.io/kyowanghwe/spring-boot-k8s:.*|ghcr.io/kyowanghwe/spring-boot-k8s:${{ github.sha }}|g" k8s/deployment.yaml
+          echo "::endgroup::"
 
-      - name: Commit and push updated deployment.yaml
+      - name: ✅ Commit and push updated deployment.yaml
         run: |
+          echo "::group::Git Commit & Push"
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
+          
           git add k8s/deployment.yaml
-          git commit -m "ci: update image tag to ${{ github.sha }}"
-          git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }} HEAD:main
-   
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "ci: update image tag to ${{ github.sha }}"
+            git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }} HEAD:main
+          fi
+          echo "::endgroup::"
