@@ -29,8 +29,10 @@ jobs:
       - name: 🐳 Build Docker image
         run: |
           echo "::group::Docker Build"
+          VERSION_TAG=$(date +'%Y%m%d-%H%M')-${GITHUB_SHA::7}
+          echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_ENV
           docker build -t ghcr.io/kyowanghwe/spring-boot-k8s:latest .
-          docker tag ghcr.io/kyowanghwe/spring-boot-k8s:latest ghcr.io/kyowanghwe/spring-boot-k8s:${{ github.sha }}
+          docker tag ghcr.io/kyowanghwe/spring-boot-k8s:latest ghcr.io/kyowanghwe/spring-boot-k8s:$VERSION_TAG
           echo "::endgroup::"
 
       - name: 🔐 Login to GHCR
@@ -44,13 +46,14 @@ jobs:
         run: |
           echo "::group::Push Docker Image"
           docker push ghcr.io/kyowanghwe/spring-boot-k8s:latest
-          docker push ghcr.io/kyowanghwe/spring-boot-k8s:${{ github.sha }}
+          docker push ghcr.io/kyowanghwe/spring-boot-k8s:$VERSION_TAG
           echo "::endgroup::"
 
-      - name: 📝 Update deployment.yaml with new image tag
+      - name: 📝 Update deployment.yaml with new image tag and version annotation
         run: |
           echo "::group::Update deployment.yaml"
-          sed -i "s|ghcr.io/kyowanghwe/spring-boot-k8s:.*|ghcr.io/kyowanghwe/spring-boot-k8s:${{ github.sha }}|g" k8s/deployment.yaml
+          sed -i "s|ghcr.io/kyowanghwe/spring-boot-k8s:.*|ghcr.io/kyowanghwe/spring-boot-k8s:${{ env.VERSION_TAG }}|g" k8s/deployment.yaml
+          sed -i "s|app.kubernetes.io/version: .*|app.kubernetes.io/version: \"${{ env.VERSION_TAG }}\"|g" k8s/deployment.yaml
           echo "::endgroup::"
 
       - name: ✅ Commit and push updated deployment.yaml

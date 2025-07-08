@@ -2,6 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: spring-boot-app
+  annotations:
+    app.kubernetes.io/version: "v1.0.0"  # This will be replaced by GitHub Actions
+    app.kubernetes.io/created-by: "github-actions"
 spec:
   replicas: 1
   selector:
