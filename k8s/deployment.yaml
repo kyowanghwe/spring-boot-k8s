@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: spring-boot-app
   annotations:
-    app.kubernetes.io/version: "20250708-0708-a35e57f"
+    app.kubernetes.io/version: "20250708-0711-7948300"
     app.kubernetes.io/created-by: "github-actions"
 spec:
   replicas: 1
@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
         - name: app
-          image: ghcr.io/kyowanghwe/spring-boot-k8s:20250708-0708-a35e57f
+          image: ghcr.io/kyowanghwe/spring-boot-k8s:20250708-0711-7948300
           ports:
             - containerPort: 8080
