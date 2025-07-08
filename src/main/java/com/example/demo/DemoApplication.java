@@ -5,6 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @RestController
 @SpringBootApplication
 public class DemoApplication {
@@ -15,6 +18,8 @@ public class DemoApplication {
 
 	@GetMapping("/")
 	public String hello() {
-		return "Hello from Spring Boot on Kubernetes! test123";
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		String formatted = LocalDateTime.now().format(formatter);
+		return "Hello from Spring Boot on Kubernetes! " + formatted;
 	}
 }
