@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: app
-          image: ghcr.io/kyowanghwe/spring-boot-k8s:e6244c5d2ae17b46f1f22a5ed3d229fd19b573d6
+          image: ghcr.io/kyowanghwe/spring-boot-k8s:d20a4f235f3ef612cd4d93a73ece62740e9582e6
           ports:
             - containerPort: 8080
